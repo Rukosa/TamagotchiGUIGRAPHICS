@@ -6,5 +6,19 @@
   </head>
   <body>
     <img src="someimage.jpg">
+    <button type="button" class="btn btn-primary" id="feedBtn">Submit</button>
+    <button type="button" class="btn btn-primary" id="playBtn">Submit</button>
+    <button type="button" class="btn btn-primary" id="sleepBtn">Submit</button>
+    <script>
+      document.getElementById("feedBtn").addEventListener("click", function(){
+        alert("Your pet has been fed!");
+    });
+      document.getElementById("playBtn").addEventListener("click", function(){
+        alert("You have played fetch!");
+    });
+      document.getElementById("sleepBtn").addEventListener("click", function(){
+        alert("Good night!");
+    });
+    </script>
   </body>
 </html>
