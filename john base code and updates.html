@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tamagotchi Game</title>
+    <style>
+      canvas {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="gameCanvas" width="500" height="500"></canvas>
+
+    <script>
+      // JOHN Set up canvas context and variables
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+      const tamagotchi = {
+        x: 200, 
+        y: 200,
+        width: 100,
+        height: 100,
+        hunger: 50,
+        happiness: 50,
+        sleepiness: 50,
+        updateStatus: function() {
+          if (this.happiness <= 30) {
+            this.image = sadImage;
+          } else if (this.hunger >= 70 || this.sleepiness >= 70) {
+            this.image = hungryImage;
+          } else {
+            this.image = happyImage;
+          }
+        }
+      };
+      let lastFeedTime = Date.now();
+      let lastPlayTime = Date.now();
+      let lastSleepTime = Date.now();
+
+      // DEV Load images
+      const happyImage = new Image();
+      happyImage.src = "https://em-content.zobj.net/source/noto-emoji-animations/344/smiling-face-with-smiling-eyes_1f60a.gif";
+      const hungryImage = new Image();
+      hungryImage.src = "https://www.emojirequest.com/images/HungryEmoji.jpg";
+      const sadImage = new Image();
+      sadImage.src = "https://www.cambridge.org/elt/blog/wp-content/uploads/2019/07/Sad-Face-Emoji.png";
+
+      // JOHN Handle user input
+      document.addEventListener("keydown", function(event) {
+        switch (event.key) {
+          case "ArrowUp":
+            tamagotchi.y -= 10;
+            break;
+          case "ArrowDown":
+            tamagotchi.y += 10;
+            break;
+          case "ArrowLeft":
+            tamagotchi.x -= 10;
+            break;
+          case "ArrowRight":
+            tamagotchi.x += 10;
+            break;
+          case "f":
+            if (Date.now() - lastFeedTime >= 5000) {
+              tamagotchi.hunger -= 10;
+              tamagotchi.updateStatus();
+              lastFeedTime = Date.now();
+            }
+            break;
+          case "p":
+            if (Date.now() - lastPlayTime >= 5000) {
+              tamagotchi.happiness += 10;
+              tamagotchi.hunger += 10;
+              tamagotchi.updateStatus();
+              lastPlayTime = Date.now();
+            }
+            break;
+          case "s":
+            if (Date.now() - lastSleepTime >= 5000) {
+              tamagotchi.sleepiness -= 10;
+              tamagotchi.updateStatus();
+              lastSleepTime = Date.now();
+            }
+            break;
+        }
+      });
+
+      // RILEY Update and render loop
+      function loop() {
+        // Update Tamagotchi status
+        if (Date.now() - lastFeedTime >= 10000) {
+          tamagotchi.hunger += 10;
+          tamagotchi.updateStatus();
+          lastFeedTime = Date.now();
+        }
+        if (Date.now() - lastPlayTime >= 10000) {
+          tamagotchi.happiness -= 10;
+          tamagotchi.hunger += 10;
+          tamagotchi.sleepiness += 10;
+          tamagotchi.updateStatus();
+          lastPlayTime = Date.now();
+        }
+        if (Date.now() - lastSleepTime >= 10000) {
+          tamagotchi.sleepiness += 10;
+          tamagotchi.updateStatus();
+          lastSleepTime = Date.now();
+        }
+
+        // DEV Clear canvas and draw Tamagotchi
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(tamagotchi.image, tamagotchi.x, tamagotchi.y, tamagotchi.width, tamagotchi.height);
+
+        // DEV Draw status bars
+        const hungerBarWidth = tamagotchi.hunger / 100 * 100;
+        ctx.fillStyle = "red";
+        ctx.fillRect(10, 10, hungerBarWidth, 10);
+
+        const happinessBarWidth = tamagotchi.happiness / 100 * 100;
+        ctx.fillStyle = "yellow";
+        ctx.fillRect(10, 30, happinessBarWidth, 10);
+
+        const sleepinessBarWidth = tamagotchi.sleepiness / 100 * 100;
+        ctx.fillStyle = "blue";
+        ctx.fillRect(10, 50, sleepinessBarWidth, 10);
+
+        // Schedule next update
+        requestAnimationFrame(loop);
+      }
+
+      // Start loop
+      tamagotchi.updateStatus();
+      loop();
+    </script>
+  </body>
+</html>
