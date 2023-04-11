@@ -8,10 +8,12 @@
       }
     </style>
   </head>
-  <body>
+  <body onload = "buttons()">
     <canvas id="gameCanvas" width="500" height="500"></canvas>
 
     <script>
+
+  
       // JOHN Set up canvas context and variables
       const canvas = document.getElementById("gameCanvas");
       const ctx = canvas.getContext("2d");
@@ -105,6 +107,7 @@
           tamagotchi.updateStatus();
           lastSleepTime = Date.now();
         }
+        
 
         // DEV Clear canvas and draw Tamagotchi
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -126,10 +129,38 @@
         // Schedule next update
         requestAnimationFrame(loop);
       }
+      
+
 
       // Start loop
       tamagotchi.updateStatus();
       loop();
+      //DEV Buttons activation
+     function buttons(){
+      document.getElementById("feedBtn").addEventListener("click", function(){
+        alert("Your pet has been fed!");
+        tamagotchi.hunger -= 50;
+          tamagotchi.updateStatus();
+          lastFeedTime = Date.now();
+    });
+      document.getElementById("playBtn").addEventListener("click", function(){
+        alert("You have played fetch!");
+        tamagotchi.happiness += 30;
+          tamagotchi.hunger += 10;
+          tamagotchi.sleepiness += 10;
+    });
+      document.getElementById("sleepBtn").addEventListener("click", function(){
+        alert("Good night!");
+        tamagotchi.sleepiness -= 100;
+          tamagotchi.updateStatus();
+          lastSleepTime = Date.now();
+    });
+  }
     </script>
+    <!--DEV button creation-->
+    <br>
+    <button type="button" class="btn btn-primary" id="feedBtn">Feed</button><br>
+    <button type="button" class="btn btn-primary" id="playBtn">Play</button><br>
+    <button type="button" class="btn btn-primary" id="sleepBtn">Sleep</button>
   </body>
 </html>
