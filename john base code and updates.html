@@ -8,28 +8,32 @@
       }
     </style>
   </head>
-  <body onload = "buttons()">
+  <body onload="buttons()">
     <canvas id="gameCanvas" width="500" height="500"></canvas>
-
     <script>
-
-  
-      // JOHN Set up canvas context and variables
+      // Set up canvas context and variables
       const canvas = document.getElementById("gameCanvas");
       const ctx = canvas.getContext("2d");
+      let gameOver = false;
+      let statusMessage = "";
+
       const tamagotchi = {
-        x: 200, 
+        x: 200,
         y: 200,
         width: 100,
         height: 100,
-        hunger: 50,
-        happiness: 50,
-        sleepiness: 50,
-        updateStatus: function() {
+        hunger: getRandomInt(20, 80),
+      happiness: getRandomInt(20, 80),
+      sleepiness: getRandomInt(20, 80),        
+      updateStatus: function() {
           if (this.happiness <= 30) {
             this.image = sadImage;
-          } else if (this.hunger >= 70 || this.sleepiness >= 70) {
+          } else if (this.hunger >= 70) {
             this.image = hungryImage;
+          } else if (this.sleepiness >= 70) {
+            this.image = sleepImage;
+          } else if (this.sleepiness >= 50) {
+            this.image = sleepyImage;
           } else {
             this.image = happyImage;
           }
@@ -39,15 +43,27 @@
       let lastPlayTime = Date.now();
       let lastSleepTime = Date.now();
 
-      // DEV Load images
+      // Load images
       const happyImage = new Image();
       happyImage.src = "https://em-content.zobj.net/source/noto-emoji-animations/344/smiling-face-with-smiling-eyes_1f60a.gif";
       const hungryImage = new Image();
       hungryImage.src = "https://www.emojirequest.com/images/HungryEmoji.jpg";
       const sadImage = new Image();
       sadImage.src = "https://www.cambridge.org/elt/blog/wp-content/uploads/2019/07/Sad-Face-Emoji.png";
+      const sleepyImage = new Image();
+      sleepyImage.src = "https://static.vecteezy.com/system/resources/previews/006/828/389/original/emotional-face-emoji-yawning-due-to-sleepy-free-vector.jpg";
+      const sleepImage = new Image();
+      sleepImage.src = "https://cdn.shopify.com/s/files/1/1061/1924/products/Sleeping_Emoji_2_grande.png?v=1571606093";
+    // Add the function to get random integers
+    function getRandomInt(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 
-      // JOHN Handle user input
+
+
+      // Handle user input
       document.addEventListener("keydown", function(event) {
         switch (event.key) {
           case "ArrowUp":
@@ -87,8 +103,18 @@
         }
       });
 
-      // RILEY Update and render loop
+      // Update and render loop
       function loop() {
+        if (gameOver) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.font = "30px Arial";
+          ctx.fillStyle = "red";
+          ctx.fillText("Game Over", 180, 250);
+          ctx.fillStyle = "black";
+          ctx.font = "20px Arial";
+          ctx.fillText(statusMessage, 120, 280);
+          return;
+        }
         // Update Tamagotchi status
         if (Date.now() - lastFeedTime >= 10000) {
           tamagotchi.hunger += 10;
@@ -108,59 +134,107 @@
           lastSleepTime = Date.now();
         }
         
-
-        // DEV Clear canvas and draw Tamagotchi
+        // Clear canvas and draw Tamagotchi
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(tamagotchi.image, tamagotchi.x, tamagotchi.y, tamagotchi.width, tamagotchi.height);
 
-        // DEV Draw status bars
-        const hungerBarWidth = tamagotchi.hunger / 100 * 100;
-        ctx.fillStyle = "red";
-        ctx.fillRect(10, 10, hungerBarWidth, 10);
+        ctx.fillStyle = "black";
+    ctx.font = "16px Arial";
+    ctx.fillText("Hunger:", 10, 10);
+    const hungerBarWidth = tamagotchi.hunger / 100 * 100;
+    ctx.fillStyle = "red";
+    ctx.fillRect(80, 5, hungerBarWidth, 10);
 
-        const happinessBarWidth = tamagotchi.happiness / 100 * 100;
-        ctx.fillStyle = "yellow";
-        ctx.fillRect(10, 30, happinessBarWidth, 10);
+    ctx.fillStyle = "black";
+    ctx.fillText("Happiness:", 10, 30);
+    const happinessBarWidth = tamagotchi.happiness / 100 * 100;
+    ctx.fillStyle = "yellow";
+    ctx.fillRect(80, 25, happinessBarWidth, 10);
 
-        const sleepinessBarWidth = tamagotchi.sleepiness / 100 * 100;
-        ctx.fillStyle = "blue";
-        ctx.fillRect(10, 50, sleepinessBarWidth, 10);
+    ctx.fillStyle = "black";
+    ctx.fillText("Sleepiness:", 10, 50);
+    const sleepinessBarWidth = tamagotchi.sleepiness / 100 * 100;
+    ctx.fillStyle = "blue";
+    ctx.fillRect(80, 45, sleepinessBarWidth, 10);
+
+        // Check game over state
+        checkGameOver();
+
+        // Prevent Tamagotchi from going off the canvas
+        checkCanvasBounds();
 
         // Schedule next update
         requestAnimationFrame(loop);
       }
-      
 
+      function checkGameOver() {
+        if (tamagotchi.hunger >= 100 || tamagotchi.happiness <= 0 || tamagotchi.sleepiness >= 100) {
+          gameOver = true;
+          statusMessage = "Your Tamagotchi has passed away.";
+        }
+      }
+
+      function restart() {
+        gameOver = false;
+        tamagotchi.x = 200;
+        tamagotchi.y = 200;
+        tamagotchi.hunger = 50;
+        tamagotchi.happiness = 50;
+        tamagotchi.sleepiness = 50;
+        lastFeedTime = Date.now();
+        lastPlayTime = Date.now();
+        lastSleepTime = Date.now();
+        tamagotchi.updateStatus();
+        loop();
+      }
+
+      // Prevent Tamagotchi from going off the canvas
+      function checkCanvasBounds() {
+        if (tamagotchi.x < 0) tamagotchi.x = 0;
+        if (tamagotchi.y < 0) tamagotchi.y = 0;
+        if (tamagotchi.x + tamagotchi.width > canvas.width) tamagotchi.x = canvas.width - tamagotchi.width;
+        if (tamagotchi.y + tamagotchi.height > canvas.height) tamagotchi.y = canvas.height - tamagotchi.height;
+      }
 
       // Start loop
       tamagotchi.updateStatus();
       loop();
-      //DEV Buttons activation
-     function buttons(){
-      document.getElementById("feedBtn").addEventListener("click", function(){
-        alert("Your pet has been fed!");
-        tamagotchi.hunger -= 50;
+
+      // Buttons activation
+      function buttons() {
+        document.getElementById("feedBtn").addEventListener("click", function() {
+          alert("Your pet has been fed!");
+          tamagotchi.hunger -= 50;
           tamagotchi.updateStatus();
           lastFeedTime = Date.now();
-    });
-      document.getElementById("playBtn").addEventListener("click", function(){
-        alert("You have played fetch!");
-        tamagotchi.happiness += 30;
+        });
+        document.getElementById("playBtn").addEventListener("click", function() {
+          alert("You have played fetch!");
+          tamagotchi.happiness += 30;
           tamagotchi.hunger += 10;
           tamagotchi.sleepiness += 10;
-    });
-      document.getElementById("sleepBtn").addEventListener("click", function(){
-        alert("Good night!");
-        tamagotchi.sleepiness -= 100;
+          tamagotchi.updateStatus();
+          lastPlayTime = Date.now();
+        });
+        document.getElementById("sleepBtn").addEventListener("click", function() {
+          alert("Good night!");
+          tamagotchi.sleepiness -= 100;
           tamagotchi.updateStatus();
           lastSleepTime = Date.now();
-    });
-  }
+        });
+        document.getElementById("restartBtn").addEventListener("click", function() {
+          restart();
+        });
+      }
     </script>
-    <!--DEV button creation-->
+    <!-- DEVIN button creation-->
     <br>
     <button type="button" class="btn btn-primary" id="feedBtn">Feed</button><br>
     <button type="button" class="btn btn-primary" id="playBtn">Play</button><br>
-    <button type="button" class="btn btn-primary" id="sleepBtn">Sleep</button>
+    <button type="button" class="btn btn-primary" id="sleepBtn">Sleep</button><br>
+    <button type="button" class="btn btn-primary" id="restartBtn">Restart</button>
   </body>
 </html>
+
+
+       
