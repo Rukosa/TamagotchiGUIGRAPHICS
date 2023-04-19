@@ -11,7 +11,7 @@
   <body onload="buttons()">
     <canvas id="gameCanvas" width="500" height="500"></canvas>
     <script>
-      // Set up canvas context and variables
+      // JOHN Set up canvas context and variables
       const canvas = document.getElementById("gameCanvas");
       const ctx = canvas.getContext("2d");
       let gameOver = false;
@@ -43,7 +43,7 @@
       let lastPlayTime = Date.now();
       let lastSleepTime = Date.now();
 
-      // Load images
+      // RILEY  Load images
       const happyImage = new Image();
       happyImage.src = "https://em-content.zobj.net/source/noto-emoji-animations/344/smiling-face-with-smiling-eyes_1f60a.gif";
       const hungryImage = new Image();
@@ -54,7 +54,7 @@
       sleepyImage.src = "https://static.vecteezy.com/system/resources/previews/006/828/389/original/emotional-face-emoji-yawning-due-to-sleepy-free-vector.jpg";
       const sleepImage = new Image();
       sleepImage.src = "https://cdn.shopify.com/s/files/1/1061/1924/products/Sleeping_Emoji_2_grande.png?v=1571606093";
-    // Add the function to get random integers
+    // JOHN Add the function to get random integers
     function getRandomInt(min, max) {
       min = Math.ceil(min);
       max = Math.floor(max);
@@ -63,7 +63,7 @@
 
 
 
-      // Handle user input
+      // JOHN Handle user input
       document.addEventListener("keydown", function(event) {
         switch (event.key) {
           case "ArrowUp":
@@ -103,7 +103,7 @@
         }
       });
 
-      // Update and render loop
+      // RILEY Update and render loop
       function loop() {
         if (gameOver) {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -115,7 +115,7 @@
           ctx.fillText(statusMessage, 120, 280);
           return;
         }
-        // Update Tamagotchi status
+        // HAKIM Update Tamagotchi status
         if (Date.now() - lastFeedTime >= 10000) {
           tamagotchi.hunger += 10;
           tamagotchi.updateStatus();
@@ -134,7 +134,7 @@
           lastSleepTime = Date.now();
         }
         
-        // Clear canvas and draw Tamagotchi
+        // RILEY Clear canvas and draw Tamagotchi
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(tamagotchi.image, tamagotchi.x, tamagotchi.y, tamagotchi.width, tamagotchi.height);
 
@@ -157,13 +157,13 @@
     ctx.fillStyle = "blue";
     ctx.fillRect(80, 45, sleepinessBarWidth, 10);
 
-        // Check game over state
+        // JOHN Check game over state
         checkGameOver();
 
-        // Prevent Tamagotchi from going off the canvas
+        // DEVIN Prevent Tamagotchi from going off the canvas
         checkCanvasBounds();
 
-        // Schedule next update
+        // JOHN Schedule next update
         requestAnimationFrame(loop);
       }
 
@@ -188,7 +188,7 @@
         loop();
       }
 
-      // Prevent Tamagotchi from going off the canvas
+      // DEVIN Prevent Tamagotchi from going off the canvas
       function checkCanvasBounds() {
         if (tamagotchi.x < 0) tamagotchi.x = 0;
         if (tamagotchi.y < 0) tamagotchi.y = 0;
@@ -196,11 +196,11 @@
         if (tamagotchi.y + tamagotchi.height > canvas.height) tamagotchi.y = canvas.height - tamagotchi.height;
       }
 
-      // Start loop
+      // JOHN Start loop
       tamagotchi.updateStatus();
       loop();
 
-      // Buttons activation
+      // DEVIN Buttons activation
       function buttons() {
         document.getElementById("feedBtn").addEventListener("click", function() {
           alert("Your pet has been fed!");
